@@ -1,3 +1,15 @@
+"""Email service for sending transactional emails.
+
+This module provides email functionality using FastAPI-Mail, supporting:
+- HTML email templates
+- Email verification flows
+- Configurable SMTP settings
+- Error handling and logging
+
+The service uses environment variables for configuration and supports
+both TLS and SSL connections to the SMTP server.
+"""
+
 import logging
 from pathlib import Path
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
@@ -10,9 +22,29 @@ from src.services.auth import TokenService
 
 
 class EmailService:
+    """Service for sending transactional emails.
+
+    This class handles email sending operations using FastAPI-Mail, including:
+    - Configuration of SMTP settings
+    - Template-based email sending
+    - Email verification token generation
+    - Error handling and logging
+
+    The service is configured using environment variables defined in settings.
+    """
+
     def __init__(
         self,
     ):
+        """Initialize email service with SMTP configuration.
+
+        Sets up the FastAPI-Mail connection configuration using settings from
+        environment variables. The configuration includes:
+        - SMTP server details (host, port)
+        - Authentication credentials
+        - TLS/SSL settings
+        - Template directory location
+        """
         self.conf = ConnectionConfig(
             MAIL_USERNAME=settings.MAIL_USERNAME,
             MAIL_PASSWORD=settings.MAIL_PASSWORD,
@@ -28,6 +60,17 @@ class EmailService:
         )
 
     async def send_email(self, message: MessageSchema, template_name: str = None):
+        """Send an email using FastAPI-Mail.
+
+        Args:
+            message (MessageSchema): Email message configuration including recipients,
+                                   subject, and template variables
+            template_name (str, optional): Name of the HTML template file. Defaults to None
+
+        Note:
+            If template_name is provided, the email will be rendered using the specified
+            HTML template. Otherwise, it will be sent as plain text.
+        """
         fm = FastMail(self.conf)
         await fm.send_message(message, template_name)
 
@@ -37,6 +80,23 @@ class EmailService:
         username: str,
         host: str,
     ):
+        """Send an email verification message.
+
+        This method:
+        1. Generates an email verification token
+        2. Creates an HTML email using the confirm_email.html template
+        3. Sends the verification email with the token
+        4. Handles and logs any connection errors
+
+        Args:
+            email (EmailStr): Recipient's email address
+            username (str): Recipient's username
+            host (str): Base URL for the verification link
+
+        Note:
+            If sending fails, the error is logged but no exception is raised
+            to prevent disrupting the registration flow.
+        """
         try:
             token_verification = TokenService().create_email_token({"sub": email})
             message = MessageSchema(
@@ -53,4 +113,4 @@ class EmailService:
 
         except ConnectionErrors as err:
             print("error mail send", err)
-            logging.error("Failed send confim email to %s , error: %s", email, err)
+            logging.error("Failed send confirm email to %s , error: %s", email, err)

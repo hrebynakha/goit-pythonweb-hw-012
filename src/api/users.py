@@ -1,3 +1,14 @@
+"""User management API endpoints for user profile operations.
+
+This module provides FastAPI router with endpoints for:
+- Retrieving user profile information
+- Updating user avatar images
+- Rate limiting on profile access
+
+The endpoints in this module require authentication and implement
+rate limiting to prevent abuse.
+"""
+
 from fastapi import APIRouter, Depends, Request, File, UploadFile
 
 from slowapi import Limiter
@@ -31,6 +42,24 @@ limiter = Limiter(key_func=get_remote_address)
 async def me(
     request: Request, user: UserModel = Depends(get_current_user)
 ):  # pylint: disable=unused-argument
+    """Get the current user's profile information.
+
+    This endpoint returns the authenticated user's profile data.
+    It is rate limited to prevent abuse.
+
+    Args:
+        request (Request): FastAPI request object (required for rate limiting)
+        user (UserModel): Current authenticated user from JWT token
+
+    Returns:
+        User: User profile information
+
+    Raises:
+        HTTPException: 401 if user is not authenticated
+
+    Note:
+        Rate limited to 5 requests per minute per IP address
+    """
     # @limiter issue https://github.com/laurentS/slowapi/issues/177
     return user
 
@@ -41,6 +70,26 @@ async def update_avatar_user(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """Update the current user's avatar image.
+
+    This endpoint allows users to upload a new avatar image. The image
+    is processed and stored using the file storage service (Cloudinary).
+
+    Args:
+        file (UploadFile): Image file to upload
+        user (User): Current authenticated user
+        db (AsyncSession): Database session
+
+    Returns:
+        User: Updated user profile with new avatar URL
+
+    Raises:
+        FileUploadError: If file upload to storage service fails
+        HTTPException: 401 if user is not authenticated
+
+    Note:
+        The avatar URL is stored in the user's profile after successful upload
+    """
     avatar_url = UploadFileService().upload_file(file, user.username)
     if not avatar_url:
         raise FileUploadError

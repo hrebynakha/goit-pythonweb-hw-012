@@ -1,4 +1,13 @@
-"""Contacts api views"""
+"""Contact management API endpoints.
+
+This module provides REST API endpoints for managing user contacts, including:
+- CRUD operations for contacts
+- Contact list filtering and pagination
+- Upcoming birthday notifications
+- Redis-based caching for improved performance
+
+All endpoints require user authentication and support proper error handling.
+"""
 
 from typing import List
 
@@ -36,7 +45,23 @@ async def read_contacts(
     user: User = Depends(get_current_user),
     redis: RedisSessionManager = Depends(get_redis),
 ):
-    """Return contacts list"""
+    """Get a paginated and filtered list of user contacts with caching.
+
+    Args:
+        background_tasks (BackgroundTasks): FastAPI background tasks for async caching
+        skip (int, optional): Number of records to skip. Defaults to 0
+        limit (int, optional): Maximum number of records to return. Defaults to 100
+        filter (str, optional): Filter query string. Defaults to ""
+        db (AsyncSession, optional): Database session. Defaults to Depends(get_db)
+        user (User, optional): Authenticated user. Defaults to Depends(get_current_user)
+        redis (RedisSessionManager, optional): Redis connection. Defaults to Depends(get_redis)
+
+    Returns:
+        List[ContactResponse]: List of contact objects
+
+    Note:
+        Results are cached in Redis for 10 seconds to improve performance
+    """
     cached_item = redis.get(f"contacts_{str(filter)}{skip}{limit}{user.id}")
     if cached_item:
         return cached_item
@@ -66,7 +91,23 @@ async def get_upcoming_birthday(
     user: User = Depends(get_current_user),
     redis: RedisSessionManager = Depends(get_redis),
 ):
-    """Return contacts list"""
+    """Get contacts with upcoming birthdays within specified time range.
+
+    Args:
+        background_tasks (BackgroundTasks): FastAPI background tasks for async caching
+        skip (int, optional): Number of records to skip. Defaults to 0
+        limit (int, optional): Maximum number of records to return. Defaults to 100
+        time_range (int, optional): Days to look ahead for birthdays. Defaults to 7
+        db (AsyncSession, optional): Database session. Defaults to Depends(get_db)
+        user (User, optional): Authenticated user. Defaults to Depends(get_current_user)
+        redis (RedisSessionManager, optional): Redis connection. Defaults to Depends(get_redis)
+
+    Returns:
+        List[ContactResponse]: List of contacts with upcoming birthdays
+
+    Note:
+        Results are cached in Redis for 1 hour to improve performance
+    """
     cached_item = redis.get(f"upcoming_birthday_{user.id}")
     if cached_item:
         return cached_item
@@ -96,7 +137,24 @@ async def read_contact(
     redis: RedisSessionManager = Depends(get_redis),
     user: User = Depends(get_current_user),
 ):
-    """Get contact by ID"""
+    """Get a specific contact by ID with caching.
+
+    Args:
+        contact_id (int): ID of the contact to retrieve
+        background_tasks (BackgroundTasks): FastAPI background tasks for async caching
+        db (AsyncSession, optional): Database session. Defaults to Depends(get_db)
+        redis (RedisSessionManager, optional): Redis connection. Defaults to Depends(get_redis)
+        user (User, optional): Authenticated user. Defaults to Depends(get_current_user)
+
+    Returns:
+        ContactResponse: Contact details
+
+    Raises:
+        ContactNotFound: If contact with given ID doesn't exist
+
+    Note:
+        Results are cached in Redis for 10 seconds to improve performance
+    """
     cached_item = redis.get(f"contact_{contact_id}")
     if cached_item:
         return cached_item
@@ -120,7 +178,19 @@ async def create_contact(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """Create new contact"""
+    """Create a new contact.
+
+    Args:
+        body (ContactModel): Contact data including name, email, phone, etc.
+        db (AsyncSession, optional): Database session. Defaults to Depends(get_db)
+        user (User, optional): Authenticated user. Defaults to Depends(get_current_user)
+
+    Returns:
+        ContactResponse: Created contact details
+
+    Note:
+        The contact will be associated with the authenticated user
+    """
     contact_service = ContactService(db)
     return await contact_service.create_contact(body, user)
 
@@ -138,7 +208,20 @@ async def update_contact(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """Udpate contact by ID"""
+    """Update an existing contact.
+
+    Args:
+        body (ContactModel): Updated contact data
+        contact_id (int): ID of the contact to update
+        db (AsyncSession, optional): Database session. Defaults to Depends(get_db)
+        user (User, optional): Authenticated user. Defaults to Depends(get_current_user)
+
+    Returns:
+        ContactResponse: Updated contact details
+
+    Raises:
+        ContactNotFound: If contact with given ID doesn't exist
+    """
     contact_service = ContactService(db)
     contact = await contact_service.update_contact(contact_id, body, user)
     if contact is None:
@@ -158,7 +241,19 @@ async def remove_contact(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """Delete contact by ID"""
+    """Delete a contact.
+
+    Args:
+        contact_id (int): ID of the contact to delete
+        db (AsyncSession, optional): Database session. Defaults to Depends(get_db)
+        user (User, optional): Authenticated user. Defaults to Depends(get_current_user)
+
+    Returns:
+        ContactResponse: Deleted contact details
+
+    Raises:
+        ContactNotFound: If contact with given ID doesn't exist
+    """
     contact_service = ContactService(db)
     contact = await contact_service.remove_contact(contact_id, user)
     if contact is None:
