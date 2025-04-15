@@ -16,6 +16,19 @@ class DatabaseException(HTTPException):
         super().__init__(status_code, detail, headers)
 
 
+class RedisException(HTTPException):
+    """Redis configuration error"""
+
+    def __init__(
+        self,
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail: str = "Database error",
+        headers: dict = None,
+    ):
+
+        super().__init__(status_code, detail, headers)
+
+
 class DatabaseConfigError(DatabaseException):
     """Database configuration error"""
 
@@ -27,4 +40,11 @@ class DatabaseConnectionError(DatabaseException):
     """Database connection error"""
 
     def __init__(self, detail="Database connection error", **kwargs):
+        super().__init__(detail=detail, **kwargs)
+
+
+class RedisConnectionError(RedisException):
+    """Redis connection error"""
+
+    def __init__(self, detail="Redis connection error", **kwargs):
         super().__init__(detail=detail, **kwargs)

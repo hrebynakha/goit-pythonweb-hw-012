@@ -2,7 +2,8 @@
 
 from typing import List
 
-from fastapi import APIRouter, Depends, status, Query
+from fastapi import APIRouter, Depends, status, Query, BackgroundTasks
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.db import get_db
@@ -14,7 +15,7 @@ from src.schemas.auth import UnauthorizedResponse
 from src.schemas.contacts import ContactNotFoundResponse
 from src.helpers.helpers import filter_normalize
 from src.models.users import User
-
+from src.redis.client import get_redis, RedisSessionManager
 
 router = APIRouter(
     prefix="/contacts",
@@ -27,16 +28,27 @@ router = APIRouter(
 
 @router.get("/", response_model=List[ContactResponse])
 async def read_contacts(
+    background_tasks: BackgroundTasks,
     skip: int = 0,
     limit: int = 100,
     filter: str = Query(default=""),  # pylint: disable=redefined-builtin
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
+    redis: RedisSessionManager = Depends(get_redis),
 ):
     """Return contacts list"""
+    cached_item = redis.get(f"contacts_{str(filter)}{skip}{limit}{user.id}")
+    if cached_item:
+        return cached_item
     contact_service = ContactService(db)
     contacts = await contact_service.get_contacts(
         filter_normalize(filter), skip, limit, user
+    )
+    background_tasks.add_task(
+        redis.set,
+        f"contacts_{str(filter)}{skip}{limit}{user.id}",
+        jsonable_encoder(contacts),
+        ex=10,
     )
     return contacts
 
@@ -46,16 +58,26 @@ async def read_contacts(
     response_model=List[ContactResponse],
 )
 async def get_upcoming_birthday(
+    background_tasks: BackgroundTasks,
     skip: int = 0,
     limit: int = 100,
     time_range: int = 7,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
+    redis: RedisSessionManager = Depends(get_redis),
 ):
     """Return contacts list"""
+    cached_item = redis.get(f"upcoming_birthday_{user.id}")
+    if cached_item:
+        return cached_item
     contact_service = ContactService(db)
+
     contacts = await contact_service.get_upcoming_birthday_contacts(
         skip, limit, time_range, user
+    )
+
+    background_tasks.add_task(
+        redis.set, f"upcoming_birthday_{user.id}", jsonable_encoder(contacts), ex=3600
     )
     return contacts
 
@@ -69,14 +91,22 @@ async def get_upcoming_birthday(
 )
 async def read_contact(
     contact_id: int,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
+    redis: RedisSessionManager = Depends(get_redis),
     user: User = Depends(get_current_user),
 ):
     """Get contact by ID"""
+    cached_item = redis.get(f"contact_{contact_id}")
+    if cached_item:
+        return cached_item
     contact_service = ContactService(db)
     contact = await contact_service.get_contact(contact_id, user)
     if contact is None:
         raise ContactNotFound
+    background_tasks.add_task(
+        redis.set, f"contact_{contact_id}", jsonable_encoder(contact), ex=10
+    )
     return contact
 
 

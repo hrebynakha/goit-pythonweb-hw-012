@@ -10,7 +10,9 @@ class Settings(BaseSettings):
     DEBUG: bool
     DB_URL: str
     ALLOWED_CORS: list[str]
-
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_PASSWORD: str | None = None
     MAIL_USERNAME: EmailStr = "example@meta.ua"
     MAIL_PASSWORD: str = "secretPassword"
     MAIL_FROM: EmailStr = "example@meta.ua"
