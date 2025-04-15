@@ -1,3 +1,12 @@
+"""Authentication API endpoints for user registration, login, and email verification.
+
+This module provides FastAPI router with endpoints for:
+- User registration with email verification
+- User login with JWT token generation
+- JWT token refresh
+- Email verification confirmation
+"""
+
 from fastapi import APIRouter, Depends, status, Request, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,6 +34,20 @@ async def register_user(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ):
+    """Register a new user with email verification.
+
+    Args:
+        user_data (UserCreate): User registration data including username, email, and password
+        background_tasks (BackgroundTasks): FastAPI background tasks for sending verification email
+        request (Request): FastAPI request object for getting base URL
+        db (AsyncSession, optional): Database session. Defaults to Depends(get_db)
+
+    Returns:
+        User: Created user object
+
+    Raises:
+        RegistrationError: If email or username already exists
+    """
     user_service = UserService(db)
 
     if await user_service.get_user_by_email(user_data.email):
@@ -43,6 +66,18 @@ async def register_user(
 async def login_user(
     form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
+    """Authenticate user and generate JWT tokens.
+
+    Args:
+        form_data (OAuth2PasswordRequestForm): Login credentials with username and password
+        db (AsyncSession, optional): Database session. Defaults to Depends(get_db)
+
+    Returns:
+        Token: Access and refresh JWT tokens
+
+    Raises:
+        AuthError: If username/password combination is invalid
+    """
     user_service = UserService(db)
     user = await user_service.get_user_by_username(form_data.username)
     if not user or not Hash().verify_password(form_data.password, user.hashed_password):
@@ -53,6 +88,18 @@ async def login_user(
 
 @router.post("/refresh-token", response_model=Token)
 async def new_token(request: TokenRefreshRequest, db: AsyncSession = Depends(get_db)):
+    """Generate new JWT tokens using a refresh token.
+
+    Args:
+        request (TokenRefreshRequest): Request containing the refresh token
+        db (AsyncSession, optional): Database session. Defaults to Depends(get_db)
+
+    Returns:
+        Token: New access and refresh JWT tokens
+
+    Raises:
+        AuthError: If refresh token is invalid or expired
+    """
     auth_service = AuthService(db)
     user = auth_service.verify_refresh_token(request.refresh_token)
     if user is None:
@@ -63,6 +110,19 @@ async def new_token(request: TokenRefreshRequest, db: AsyncSession = Depends(get
 
 @router.get("/confirmed_email/{token}", response_model=EmailVerifyResponse)
 async def confirmed_email(token: str, db: AsyncSession = Depends(get_db)):
+    """Verify user's email address using verification token.
+
+    Args:
+        token (str): Email verification token
+        db (AsyncSession, optional): Database session. Defaults to Depends(get_db)
+
+    Returns:
+        EmailVerifyResponse: Success message indicating email verification status
+
+    Raises:
+        InvalidVerificationTokenError: If verification token is invalid
+        VerificationError: If user not found for the email in token
+    """
     email = await TokenService().get_email_from_token(token)
     if not email:
         raise InvalidVerificationTokenError
