@@ -20,7 +20,32 @@ async def get_current_user(
     db: AsyncSession = Depends(get_db),
     token: str = Depends(oauth2_scheme),
     redis: RedisSessionManager = Depends(get_redis),
-):
+) -> User:
+    """Authenticate and retrieve the current user from JWT token with Redis caching.
+
+    This function performs the following steps:
+    1. Checks Redis cache for user data using the token as key
+    2. If not in cache, decodes and validates the JWT token
+    3. Retrieves user from database using the username from token
+    4. Validates user verification status
+    5. Caches user data in Redis for future requests
+
+    Args:
+        background_tasks (BackgroundTasks): FastAPI background tasks for async Redis caching
+        db (AsyncSession): Database session for user lookup. Defaults to Depends(get_db)
+        token (str): JWT authentication token. Defaults to Depends(oauth2_scheme)
+        redis (RedisSessionManager): Redis connection manager. Defaults to Depends(get_redis)
+
+    Returns:
+        User: Authenticated user object
+
+    Raises:
+        AuthError: In the following cases:
+            - Invalid/expired JWT token
+            - Missing username in token payload
+            - User not found in database
+            - User email not verified
+    """
     cached_item = redis.get(f"user_{token}")
     if cached_item:
         return User(**cached_item)
