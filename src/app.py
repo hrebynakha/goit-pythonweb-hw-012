@@ -24,14 +24,27 @@ from src.api import utils, contacts, auth, users
 from src.conf.config import settings
 from src.exceptions.core import AppHttpError, AppValueError, AppKeyError
 from src.exceptions.contacts import EmailValueError, ContactNotFound
+from src.exceptions.utils import DatabaseConnectionError
 from src.schemas.core import ErrorResponseModel
 
 # Initialize FastAPI app with global error response models
 app = FastAPI(
+    title="UContacts REST API Service",
+    version="1.0.0",
+    description="""
+    UContacts is a secure REST API for managing personal and business contacts.
+    Features include JWT authentication, role-based access, advanced filtering, and more.
+    """,
+    contact={
+        "name": "Hrebynakha Anatolii",
+        "url": "https://github.com/hrebynakha/goit-pythonweb-hw-012",
+        "email": "hrebynakha@gmail.com",
+    },
+    license_info={"name": "MIT", "url": "https://opensource.org/licenses/MIT"},
     responses={
         500: {"model": ErrorResponseModel, "description": "Internal server error"},
         400: {"model": ErrorResponseModel, "description": "Bad request"},
-    }
+    },
 )
 
 # Configure CORS middleware
@@ -124,7 +137,7 @@ async def connection_exception_handler(
     Raises:
         AppHttpError: HTTP 500 error with database connection message
     """
-    if isinstance(error, ConnectionRefusedError):
+    if isinstance(error, DatabaseConnectionError):
         raise AppHttpError(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database connection error",

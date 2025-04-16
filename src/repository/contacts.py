@@ -41,12 +41,12 @@ class ContactRepository:
         self.db = session
 
     async def get_contacts(
-        self, filter_: str, skip: int, limit: int, user: User
+        self, query: str, skip: int, limit: int, user: User
     ) -> List[Contact]:
         """Retrieve filtered and paginated list of user contacts.
 
         Args:
-            filter_ (str): Filter query string for contact filtering
+            query (str): Filter query string for contact filtering
             skip (int): Number of records to skip (offset)
             limit (int): Maximum number of records to return
             user (User): User whose contacts to retrieve
@@ -57,14 +57,10 @@ class ContactRepository:
         filter_inst = FilterCore(
             Contact, contact_filter, select(Contact).filter(Contact.user_id == user.id)
         )
-        query = (
-            filter_inst.get_query(filter_)
-            .offset(skip)
-            .limit(limit)
-            .order_by(Contact.id)
+        query_ = (
+            filter_inst.get_query(query).offset(skip).limit(limit).order_by(Contact.id)
         )
-        print(filter_inst.get_query(filter_))
-        contacts = await self.db.execute(query)
+        contacts = await self.db.execute(query_)
         return contacts.scalars().all()
 
     async def get_contact_by_id(self, contact_id: int, user: User) -> Contact | None:

@@ -55,14 +55,16 @@ class ContactService:
         """
         existing_contact = await self.repository.get_contact_by_email(body.email, user)
         if existing_contact:
-            raise EmailValueError(f"Contact with this email {body.email} already exists")
+            raise EmailValueError(
+                f"Contact with this email {body.email} already exists"
+            )
         return await self.repository.create_contact(body, user)
 
-    async def get_contacts(self, filter_: str, skip: int, limit: int, user: User):
+    async def get_contacts(self, query: str, skip: int, limit: int, user: User):
         """Retrieve filtered and paginated contacts for a user.
 
         Args:
-            filter_ (str): Filter string for searching contacts
+            query (str): Filter string for searching contacts
             skip (int): Number of records to skip (offset)
             limit (int): Maximum number of records to return
             user (User): User whose contacts to retrieve
@@ -70,7 +72,7 @@ class ContactService:
         Returns:
             List[Contact]: List of contacts matching the criteria
         """
-        return await self.repository.get_contacts(filter_, skip, limit, user)
+        return await self.repository.get_contacts(query, skip, limit, user)
 
     async def get_contact(self, contact_id: int, user: User):
         """Retrieve a specific contact by ID.
@@ -105,7 +107,9 @@ class ContactService:
             body.email, contact_id, user
         )
         if existing_contact:
-            raise EmailValueError(f"Contact with this email {body.email} already exists")
+            raise EmailValueError(
+                f"Contact with this email {body.email} already exists"
+            )
         return await self.repository.update_contact(contact_id, body, user)
 
     async def remove_contact(self, contact_id: int, user: User):

@@ -40,7 +40,7 @@ async def read_contacts(
     background_tasks: BackgroundTasks,
     skip: int = 0,
     limit: int = 100,
-    filter: str = Query(default=""),  # pylint: disable=redefined-builtin
+    query: str = Query(default=""),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
     redis: RedisSessionManager = Depends(get_redis),
@@ -62,16 +62,17 @@ async def read_contacts(
     Note:
         Results are cached in Redis for 10 seconds to improve performance
     """
-    cached_item = redis.get(f"contacts_{str(filter)}{skip}{limit}{user.id}")
+    key = f"contacts_{str(query)}{skip}{limit}{user.id}"
+    cached_item = redis.get(key)
     if cached_item:
         return cached_item
     contact_service = ContactService(db)
     contacts = await contact_service.get_contacts(
-        filter_normalize(filter), skip, limit, user
+        filter_normalize(query), skip, limit, user
     )
     background_tasks.add_task(
         redis.set,
-        f"contacts_{str(filter)}{skip}{limit}{user.id}",
+        key,
         jsonable_encoder(contacts),
         ex=10,
     )
