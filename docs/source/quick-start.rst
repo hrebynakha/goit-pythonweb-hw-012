@@ -1,12 +1,12 @@
 .. _quick_start:
 
 Quick Start
-==========
+===========
 
 This guide will help you get the UContact REST API Service up and running quickly.
 
 Prerequisites
-------------
+-------------
 
 Before starting, ensure you have the following installed:
 
@@ -15,7 +15,7 @@ Before starting, ensure you have the following installed:
 * Redis
 
 Installation
------------
+------------
 
 1. Clone the repository::
 
@@ -32,7 +32,7 @@ Installation
     $ pip install -r requirements.txt
 
 Configuration
-------------
+-------------
 
 1. Create a `.env` file based on `.example.env`::
 
@@ -41,7 +41,7 @@ Configuration
 2. Update the environment variables in `.env` with your database and Redis credentials.
 
 Running the Application
----------------------
+-----------------------
 
 1. Create the database::
 
@@ -58,7 +58,7 @@ Running the Application
 The API will be available at http://localhost:8000
 
 API Documentation
----------------
+-----------------
 
 Once the application is running, you can access:
 

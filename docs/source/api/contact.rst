@@ -1,7 +1,7 @@
 .. _api_contacts:
 
 Contact API
-==========
+===========
 
 The Contact API provides endpoints for managing user contacts, including CRUD operations, filtering, and birthday notifications.
 
@@ -12,12 +12,12 @@ Swagger/Redoc UI documentation (Demo)
 * Alternative API documentation: https://try.api.ucontacts.d0s.site/redoc
 
 API Endpoints
------------
+-------------
 
 List Contacts
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
-.. http:get:: /api/contacts/
+.. http::get:: /api/contacts/
 
    Get a paginated and filtered list of contacts.
 
@@ -57,9 +57,9 @@ List Contacts
       ]
 
 Upcoming Birthdays
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
-.. http:get:: /api/contacts/get-upcoming-birthday
+.. http::get:: /api/contacts/get-upcoming-birthday
 
    Get contacts with upcoming birthdays within a specified time range.
 
@@ -70,9 +70,9 @@ Upcoming Birthdays
    - ``time_range`` (optional): Days to look ahead for birthdays (default: 7)
 
 Get Contact
-~~~~~~~~~~
+~~~~~~~~~~~
 
-.. http:get:: /api/contacts/(int:contact_id)
+.. http::get:: /api/contacts/(int:contact_id)
 
    Get a specific contact by ID.
 
@@ -96,9 +96,9 @@ Get Contact
       }
 
 Create Contact
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
-.. http:post:: /api/contacts/
+.. http::post:: /api/contacts/
 
    Create a new contact.
 
@@ -120,9 +120,9 @@ Create Contact
       }
 
 Update Contact
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
-.. http:put:: /api/contacts/(int:contact_id)
+.. http::put:: /api/contacts/(int:contact_id)
 
    Update an existing contact.
 
@@ -144,9 +144,9 @@ Update Contact
       }
 
 Delete Contact
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
-.. http:delete:: /api/contacts/(int:contact_id)
+.. http::delete:: /api/contacts/(int:contact_id)
 
    Delete a contact.
 
@@ -170,9 +170,9 @@ Delete Contact
       }
 
 Error Responses
--------------
+---------------
 
-.. http:any:: /api/contacts/*
+.. http::any:: /api/contacts/*
 
    **Example error responses**:
 
@@ -195,10 +195,10 @@ Error Responses
       }
 
 Implementation Details
--------------------
+----------------------
 
 API Layer
-~~~~~~~~
+~~~~~~~~~
 
 .. automodule:: src.api.contacts
    :members:
@@ -206,7 +206,7 @@ API Layer
    :show-inheritance:
 
 Service Layer
-~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. automodule:: src.services.contacts
    :members:
@@ -214,7 +214,7 @@ Service Layer
    :show-inheritance:
 
 Repository Layer
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. automodule:: src.repository.contacts
    :members:
@@ -222,24 +222,24 @@ Repository Layer
    :show-inheritance:
 
 Models and Schemas
----------------
+------------------
 
 Contact Model
-~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. autoclass:: src.schemas.contacts.ContactModel
    :members:
    :undoc-members:
 
 Contact Response
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. autoclass:: src.schemas.contacts.ContactResponse
    :members:
    :undoc-members:
 
 Caching
-------
+-------
 
 The Contact API implements Redis-based caching for improved performance:
 

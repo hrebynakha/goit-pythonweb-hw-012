@@ -6,7 +6,7 @@ Authentication
 The UContact REST API Service uses JWT (JSON Web Token) based authentication with email verification.
 
 Authentication Flow
------------------
+-------------------
 
 1. **Registration**: Users register with email, username, and password
 2. **Email Verification**: A verification link is sent to the user's email
@@ -15,12 +15,12 @@ Authentication Flow
 5. **Token Refresh**: Expired tokens can be refreshed using a refresh token
 
 API Endpoints
------------
+-------------
 
 Register
 ~~~~~~~~
 
-.. http:post:: /api/auth/register
+.. http::post:: /api/auth/register
 
 Register a new user with email verification.
 
@@ -48,9 +48,9 @@ Register a new user with email verification.
     }
 
 Login
-~~~~~
+~~~~~~
 
-.. http:post:: /api/auth/login
+.. http::post:: /api/auth/login
 
 Authenticate user and receive JWT tokens.
 
@@ -70,9 +70,9 @@ Authenticate user and receive JWT tokens.
     }
 
 Refresh Token
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
-.. http:post:: /api/auth/refresh-token
+.. http::post:: /api/auth/refresh-token
 
 Generate new JWT tokens using a refresh token.
 
@@ -95,9 +95,9 @@ Generate new JWT tokens using a refresh token.
     }
 
 Email Verification
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
-.. http:get:: /api/auth/confirmed_email/{token}
+.. http::get:: /api/auth/confirmed_email/{token}
 
 Verify user's email address using the verification token sent via email.
 
@@ -110,10 +110,10 @@ Verify user's email address using the verification token sent via email.
     }
 
 API Implementation
-----------------
+------------------
 
 Authentication Router
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: src.api.auth
    :members:
@@ -121,7 +121,7 @@ Authentication Router
    :show-inheritance:
 
 Authentication Service
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: src.services.auth
    :members:
@@ -129,7 +129,7 @@ Authentication Service
    :show-inheritance:
 
 Using Authentication
-------------------
+--------------------
 
 To use authentication in your requests:
 
@@ -143,8 +143,7 @@ To use authentication in your requests:
     curl -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc..." http://localhost:8000/api/contacts
 
 Token Expiration
---------------
-
+----------------
 - Access tokens expire after 15 minutes (by default)
 - Refresh tokens expire after 7 days (by default)
 - Use the refresh token endpoint to get new tokens before expiration
