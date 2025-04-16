@@ -53,19 +53,17 @@ Docker Compose Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Use a ``compose.yaml`` file:
-.. code-block:: yaml
 
-    {{ include_file("compose.yaml") }}
+.. code-block:: yaml
+    {{ include_file("../compose.yaml") }}
 
 Dockerfile
 ~~~~~~~~~
 
 Example of Dockerfile:
+
 .. code-block:: dockerfile
-
-    {{ include_file("Dockerfile") }}
-
-
+    {{ include_file("../Dockerfile") }}
 
 
 Deployment Commands
