@@ -133,6 +133,7 @@ class ContactRepository:
             Contact: Created contact object
         """
         contact = Contact(**body.model_dump(exclude_unset=True), user=user)
+        print("Creting conatct...", contact)
         self.db.add(contact)
         await self.db.commit()
         await self.db.refresh(contact)

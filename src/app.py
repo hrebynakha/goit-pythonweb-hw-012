@@ -37,6 +37,9 @@ app = FastAPI(
     responses={
         500: {"model": ErrorResponseModel, "description": "Internal server error"},
         400: {"model": ErrorResponseModel, "description": "Bad request"},
+        401: {"model": ErrorResponseModel, "description": "Unauthorized"},
+        403: {"model": ErrorResponseModel, "description": "Forbidden"},
+        404: {"model": ErrorResponseModel, "description": "Not found"},
     },
 )
 

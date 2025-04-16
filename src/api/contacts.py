@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.db import get_db
 from src.schemas.contacts import ContactModel, ContactResponse
 from src.services.contacts import ContactService
-from src.dependencies.auth import get_current_user
+from src.dependencies.roles import get_current_user
 from src.exceptions.contacts import ContactNotFound
 from src.schemas.auth import UnauthorizedResponse
 from src.schemas.contacts import ContactNotFoundResponse
@@ -192,6 +192,7 @@ async def create_contact(
     Note:
         The contact will be associated with the authenticated user
     """
+    print("Create ne conatct", body, "fro user", user)
     contact_service = ContactService(db)
     return await contact_service.create_contact(body, user)
 

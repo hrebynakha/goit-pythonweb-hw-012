@@ -19,7 +19,7 @@ from src.database.db import get_db
 from src.models.users import User as UserModel
 from src.schemas.users import User
 from src.schemas.auth import UnauthorizedResponse
-from src.dependencies.auth import get_current_user
+from src.dependencies.roles import get_current_user, get_current_admin_user
 from src.services.fs import UploadFileService
 from src.services.users import UserService
 from src.exceptions.fs import FileUploadError
@@ -67,7 +67,7 @@ async def me(
 @router.patch("/avatar", response_model=User)
 async def update_avatar_user(
     file: UploadFile = File(),
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Update the current user's avatar image.

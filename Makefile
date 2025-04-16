@@ -6,7 +6,7 @@ newdb:
 	docker exec -it hw012 sh -c "psql -U postgres -c 'create database contacts_app'"
 	alembic upgrade head
 migration:
-	alembic revision --autogenerate -m $$m
+	alembic revision --autogenerate -m "$m"
 migrate:
 	alembic upgrade head
 f:

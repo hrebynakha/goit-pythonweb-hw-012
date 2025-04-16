@@ -14,8 +14,10 @@ from typing import Optional
 from sqlalchemy import Integer, String, func, Boolean
 from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy.sql.sqltypes import DateTime
+from sqlalchemy import Enum as SqlEnum
 
 from src.database.basic import Base
+from src.models.roles import Role
 
 
 class User(Base):
@@ -35,6 +37,7 @@ class User(Base):
         avatar (str): Optional URL to user's avatar image, max 255 chars
         refresh_token (str): Optional JWT refresh token, max 255 chars
         is_verified (bool): Email verification status, defaults to False
+        role (Role): User role, defaults to USER
 
     Note:
         - Both username and email have unique constraints
@@ -63,3 +66,6 @@ class User(Base):
     avatar: Mapped[str] = mapped_column(String(255), nullable=True)
     refresh_token: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    # Role
+    role: Mapped[Role] = mapped_column(SqlEnum(Role), default=Role.USER, nullable=False)
