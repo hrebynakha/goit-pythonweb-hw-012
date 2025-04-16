@@ -1,15 +1,15 @@
 .. _configuration:
 
 Configuration
-============
+=============
 
 The UContact REST API Service uses environment variables for configuration. These settings can be configured through a `.env` file or system environment variables.
 
 Environment Variables
--------------------
+---------------------
 
 Database Configuration
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 * ``POSTGRES_DB`` - PostgreSQL database name
 * ``POSTGRES_USER`` - PostgreSQL username
@@ -18,14 +18,14 @@ Database Configuration
 * ``POSTGRES_HOST`` - PostgreSQL host (default: localhost)
 
 Redis Configuration
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 * ``REDIS_HOST`` - Redis server host (default: localhost)
 * ``REDIS_PORT`` - Redis server port (default: 6379)
 * ``REDIS_PASSWORD`` - Redis password (if required)
 
 JWT Authentication
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 * ``SECRET_KEY`` - Secret key for JWT token generation
 * ``ALGORITHM`` - JWT encryption algorithm (default: HS256)
@@ -33,7 +33,7 @@ JWT Authentication
 * ``REFRESH_TOKEN_EXPIRE_MINUTES`` - JWT refresh token expiration time in minutes (default: 7 days)
 
 Email Configuration
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 * ``MAIL_USERNAME`` - SMTP username for email notifications
 * ``MAIL_PASSWORD`` - SMTP password
@@ -46,7 +46,7 @@ Email Configuration
 
 
 Example .env File
----------------
+-----------------
 
 Here's an example `.env` file with default values::
 
@@ -78,7 +78,7 @@ Here's an example `.env` file with default values::
     MAIL_SSL=False
 
 Configuration Module
-------------------
+--------------------
 
 The configuration settings are managed in `src/conf/config.py`. This module:
 
