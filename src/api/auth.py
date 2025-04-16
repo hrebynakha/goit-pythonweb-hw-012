@@ -7,11 +7,18 @@ This module provides FastAPI router with endpoints for:
 - Email verification confirmation
 """
 
-from fastapi import APIRouter, Depends, status, Request, BackgroundTasks
+from fastapi import APIRouter, Depends, status, Request, BackgroundTasks, Form
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.schemas.auth import Token, TokenRefreshRequest, EmailVerifyResponse
+from src.schemas.auth import (
+    ResetPasswordRequest,
+    ResetPasswordResponse,
+    SetPasswordResponse,
+    Token,
+    TokenRefreshRequest,
+    EmailVerifyResponse,
+)
 from src.schemas.users import User, UserCreate
 from src.services.auth import AuthService, Hash, TokenService
 from src.services.users import UserService
@@ -19,6 +26,7 @@ from src.services.users import UserService
 from src.database.db import get_db
 from src.exceptions.auth import (
     AuthError,
+    NewPasswordError,
     RegistrationError,
     VerificationError,
     InvalidVerificationTokenError,
@@ -135,3 +143,58 @@ async def confirmed_email(token: str, db: AsyncSession = Depends(get_db)):
         return {"message": "Your email has already been confirmed."}
     await user_service.confirmed_email(email)
     return {"message": "Email verified successfully"}
+
+
+@router.post("/reset-password", response_model=ResetPasswordResponse)
+async def reset_password(
+    user_data: ResetPasswordRequest,
+    background_tasks: BackgroundTasks,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    """Reset user's password.
+
+    Args:
+        db (AsyncSession, optional): Database session. Defaults to Depends(get_db)
+
+    Returns:
+        ResetPasswordResponse: Success message indicating password reset status
+
+    """
+    reset_response = {"message": "If the email exists, a reset link was sent."}
+    user_service = UserService(db)
+    user = await user_service.get_user_by_email(user_data.email)
+    if user is None:
+        return reset_response
+
+    if not user.is_verified:
+        return reset_response
+
+    await user_service.send_reset_password_link(
+        user.email, user.username, background_tasks, request.base_url
+    )
+    return reset_response
+
+
+@router.post("/set-password", response_model=SetPasswordResponse)
+async def set_password(
+    token: str = Form(...),
+    password: str = Form(...),
+    confirm_password: str = Form(...),
+    db: AsyncSession = Depends(get_db),
+):
+    """Set to user new password"""
+    if password != confirm_password:
+        raise NewPasswordError
+
+    email = await TokenService().get_email_from_token(token)
+    if not email:
+        raise InvalidVerificationTokenError
+
+    user_service = UserService(db)
+    user = await user_service.get_user_by_email(email)
+    if not user:
+        raise VerificationError
+
+    await user_service.update_password(email, password)
+    return {"message": "Password successfully updated"}

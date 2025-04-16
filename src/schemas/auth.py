@@ -8,7 +8,7 @@ It includes:
 - Email verification responses
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from src.schemas.core import ErrorResponseModel
 
 
@@ -60,6 +60,42 @@ class EmailVerifyResponse(BaseModel):
 
     Attributes:
         message (str): Status message about the verification result
+    """
+
+    message: str
+
+
+class ResetPasswordRequest(BaseModel):
+    """Reset password request model.
+
+    Used for requests to reset password.
+
+    Attributes:
+        email (EmailStr): Email address of user to reset password
+    """
+
+    email: EmailStr
+
+
+class ResetPasswordResponse(BaseModel):
+    """Reset password response model.
+
+    Used for responses to reset password requests.
+
+    Attributes:
+        message (str): Status message about the reset request result
+    """
+
+    message: str
+
+
+class SetPasswordResponse(BaseModel):
+    """Set password response model.
+
+    Used for responses to set password requests.
+
+    Attributes:
+        message (str): Status message about the set request result
     """
 
     message: str

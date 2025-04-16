@@ -20,7 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
 
 from src.api import utils, contacts, auth, users
-
+from src.views import auth as views_auth, index
 from src.conf.config import settings
 from src.exceptions.core import AppHttpError, AppValueError, AppKeyError
 from src.exceptions.contacts import EmailValueError, ContactNotFound
@@ -50,6 +50,9 @@ app.add_middleware(
 )
 
 # Register API routers
+app.include_router(index.router)
+app.include_router(views_auth.router)
+
 app.include_router(utils.router, prefix="/api")
 app.include_router(contacts.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")

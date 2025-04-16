@@ -80,6 +80,26 @@ class UserService:
         )
         return new_user
 
+    async def send_reset_password_link(
+        self,
+        email: str,
+        username: str,
+        background_tasks: BackgroundTasks,
+        host_url: str = None,
+    ):
+        """Send a password reset link to the user's email.
+
+        Args:
+            email (str): User's email address
+            username (str): User's username
+            background_tasks (BackgroundTasks): FastAPI background task manager
+            host_url (str, optional): Base URL for email verification. Defaults to None
+        """
+        mail_service = EmailService()
+        background_tasks.add_task(
+            mail_service.send_reset_password_link, email, username, host_url
+        )
+
     async def get_user_by_id(self, user_id: int):
         """Retrieve a user by their ID.
 
@@ -135,3 +155,16 @@ class UserService:
             User | None: Updated user object if found, None otherwise
         """
         return await self.repository.update_avatar_url(email, url)
+
+    async def update_password(self, email: str, new_password: str):
+        """Update a user's password.
+
+        Args:
+            user (User): User object
+            new_password (str): New password
+
+        Returns:
+            User | None: Updated user object if found, None otherwise
+        """
+        hashed_password = Hash().get_password_hash(new_password)
+        return await self.repository.update_password(email, hashed_password)

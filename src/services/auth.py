@@ -28,15 +28,16 @@ from src.schemas.users import User
 @dataclass
 class SolveBugBcryptWarning:
     """Temporary fix for bcrypt warning issue #684.
-    
+
     See: https://github.com/pyca/bcrypt/issues/684
     """
+
     __version__: str = getattr(bcrypt, "__version__")
 
 
 class Hash:
     """Password hashing service using bcrypt."""
-    
+
     setattr(bcrypt, "__about__", SolveBugBcryptWarning())
 
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -104,6 +105,23 @@ class TokenService:
         """
         to_encode = data.copy()
         expire = datetime.now(timezone.utc) + timedelta(days=7)
+        to_encode.update({"iat": datetime.now(timezone.utc), "exp": expire})
+        token = jwt.encode(
+            to_encode, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM
+        )
+        return token
+
+    def create_reset_password_token(self, data: dict) -> str:
+        """Create a JWT token for reset password verification.
+
+        Args:
+            data (dict): Email data to encode in token
+
+        Returns:
+            str: Encoded JWT token valid for 15 minutes
+        """
+        to_encode = data.copy()
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
         to_encode.update({"iat": datetime.now(timezone.utc), "exp": expire})
         token = jwt.encode(
             to_encode, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM

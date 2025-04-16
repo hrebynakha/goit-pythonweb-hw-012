@@ -100,7 +100,7 @@ class EmailService:
         try:
             token_verification = TokenService().create_email_token({"sub": email})
             message = MessageSchema(
-                subject="Confirm your email",
+                subject=f"{settings.TITLE} - Confirm your email",
                 recipients=[email],
                 template_body={
                     "host": host,
@@ -112,5 +112,25 @@ class EmailService:
             await self.send_email(message, "confirm_email.html")
 
         except ConnectionErrors as err:
-            print("error mail send", err)
+            logging.error("Failed send confirm email to %s , error: %s", email, err)
+
+    async def send_reset_password_link(self, email: EmailStr, username: str, host: str):
+        try:
+            token_verification = TokenService().create_reset_password_token(
+                {"sub": email}
+            )
+            message = MessageSchema(
+                # Reset password subjects marks as SPAM
+                subject=f"{settings.TITLE} - Service maintenance request",  # no SPAM title
+                recipients=[email],
+                template_body={
+                    "host": host,
+                    "username": username,
+                    "token": token_verification,
+                },
+                subtype=MessageType.html,
+            )
+            await self.send_email(message, "reset_password_via_email.html")
+
+        except ConnectionErrors as err:
             logging.error("Failed send confirm email to %s , error: %s", email, err)

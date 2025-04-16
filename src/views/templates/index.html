@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to UContacts</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(120deg, #b1bedb 0%, #60a5fa 100%);
+        font-family: "Inter", Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+        padding: 48px 36px 36px 36px;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+      }
+      .logo {
+        width: 64px;
+        margin-bottom: 16px;
+      }
+      h1 {
+        margin: 0 0 12px 0;
+        color: #2563eb;
+        font-size: 2.2em;
+        font-weight: 600;
+      }
+      p {
+        color: #4b5563;
+        font-size: 1.1em;
+        margin-bottom: 28px;
+      }
+      .links {
+        margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .button {
+        display: inline-block;
+        background: linear-gradient(90deg, #2563eb 0%, #60a5fa 100%);
+        color: #fff;
+        padding: 12px 0;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.07em;
+        transition: background 0.2s;
+      }
+      .button:hover {
+        background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
+      }
+      .footer {
+        margin-top: 32px;
+        color: #9ca3af;
+        font-size: 0.99em;
+      }
+      @media (max-width: 600px) {
+        .card {
+          padding: 32px 10px;
+        }
+        h1 {
+          font-size: 1.5em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <img
+        class="logo"
+        src="https://cdn-icons-png.flaticon.com/512/747/747376.png"
+        alt="UContacts Logo"
+      />
+      <h1>Welcome to UContacts API</h1>
+      <p>
+        Your modern, secure solution for managing personal and business
+        contacts.<br />
+        FastAPI powered, with JWT authentication, advanced filtering, and more.
+      </p>
+      <div class="links">
+        <a class="button" href="/docs">Swagger API Docs</a>
+        <a class="button" href="/redoc">ReDoc API Docs</a>
+        <a
+          class="button"
+          href="https://goit-pythonweb-hw-012.readthedocs.io/en/latest/"
+          >Full Documentation</a
+        >
+        <a
+          class="button"
+          href="https://github.com/hrebynakha/goit-pythonweb-hw-012"
+          >GitHub Repo</a
+        >
+      </div>
+      <div class="footer">
+        &copy; 2025 UContacts &mdash; Made with
+        <span style="color: #f87171">&#10084;&#65039;</span> by Hrebynakha
+        Anatolii
+      </div>
+    </div>
+  </body>
+</html>
