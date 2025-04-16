@@ -98,6 +98,25 @@ class Settings(BaseSettings):
     ACCESS_JWT_EXPIRATION_SECONDS: int = 900  # 15 min
     REFRESH_JWT_EXPIRATION_SECONDS: int = 604800  # 7 days
 
+    # Optional configuration
+
+    TITLE: str = "UContacts REST API Service"
+    VERSION: str = "1.0.0"
+    DESCRIPTION: str = """
+    UContacts is a secure REST API for managing personal and business contacts.
+    Features include JWT authentication, role-based access, advanced filtering, and more.
+    """
+
+    CONTACT: dict[str, str] = {
+        "name": "Hrebynakha Anatolii",
+        "url": "https://github.com/hrebynakha/goit-pythonweb-hw-012",
+        "email": "hrebynakha@gmail.com",
+    }
+    LICENSE_INFO: dict[str, str] = {
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT",
+    }
+
     model_config = ConfigDict(
         extra="ignore", env_file=".env", env_file_encoding="utf-8", case_sensitive=True
     )

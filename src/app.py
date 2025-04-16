@@ -29,18 +29,11 @@ from src.schemas.core import ErrorResponseModel
 
 # Initialize FastAPI app with global error response models
 app = FastAPI(
-    title="UContacts REST API Service",
-    version="1.0.0",
-    description="""
-    UContacts is a secure REST API for managing personal and business contacts.
-    Features include JWT authentication, role-based access, advanced filtering, and more.
-    """,
-    contact={
-        "name": "Hrebynakha Anatolii",
-        "url": "https://github.com/hrebynakha/goit-pythonweb-hw-012",
-        "email": "hrebynakha@gmail.com",
-    },
-    license_info={"name": "MIT", "url": "https://opensource.org/licenses/MIT"},
+    title=settings.TITLE,
+    version=settings.VERSION,
+    description=settings.DESCRIPTION,
+    contact=settings.CONTACT,
+    license_info=settings.LICENSE_INFO,
     responses={
         500: {"model": ErrorResponseModel, "description": "Internal server error"},
         400: {"model": ErrorResponseModel, "description": "Bad request"},
