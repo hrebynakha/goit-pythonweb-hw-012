@@ -25,3 +25,5 @@ docrq:
 	poetry export --without-hashes -f requirements.txt --output docs/requirements.txt --only "docs"
 tst:
 	pytest -v tests
+reptest:
+	pytest --cov=src tests/ --cov-report=html 

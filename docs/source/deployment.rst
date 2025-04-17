@@ -1,12 +1,12 @@
 .. _deployment:
 
 Deployment
-=========
+==========
 
 This guide covers different deployment options for the UContact REST API Service.
 
 Docker Compose Deployment
------------------------
+-------------------------
 
 The application can be deployed using Docker Compose, which sets up all required services:
 
@@ -14,29 +14,31 @@ The application can be deployed using Docker Compose, which sets up all required
 2. PostgreSQL database
 3. Redis for caching
 
-1. Install all and run migration::
+1. Install all dependencies and run database migration:
 
   $ make install
 
-2. Setup nginx::
+2. Setup nginx:
 
   $ sudo apt install nginx
 
-3. Create nginx config::
-  Example of nginx configuration file:
+3. Create nginx config:
+
+Example of nginx configuration file:
 
 .. code-block:: nginx
-  
-      server {
-          listen 80;
-          server_name localhost;
 
-          location / {
-              proxy_pass http://fastapi_app;
-              proxy_set_header Host $host;
-              proxy_set_header X-Real-IP $remote_addr;
-          }
-      }
+    server {
+        listen 80;
+        server_name localhost;
+
+        location / {
+            proxy_pass http://fastapi_app;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+    }
+
 4. Links sites and restart Nginx
 
   $ sudo cp ucontact.conf /etc/nginx/sites-available/ucontact
@@ -50,21 +52,23 @@ Congrats! Now you can use your application.
 You can also modify ``compose.yaml`` and ``Dockerfile`` to you needs:
 
 Docker Compose Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Use a ``compose.yaml`` file:
 
-.. code-block:: yaml
-    {{ include_file("../compose.yaml") }}
+.. literalinclude:: ../../compose.yaml
+   :language: yaml
+   :linenos:
+
 
 Dockerfile
-~~~~~~~~~
+~~~~~~~~~~
 
 Example of Dockerfile:
 
-.. code-block:: dockerfile
-    {{ include_file("../Dockerfile") }}
-
+.. literalinclude:: ../../Dockerfile
+   :language: dockerfile
+   :linenos:
 
 Deployment Commands
 -------------------
@@ -72,7 +76,7 @@ Deployment Commands
 The application includes several Makefile commands for easy deployment:
 
 Database Management
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: make
 
@@ -90,7 +94,7 @@ Database Management
         alembic revision --autogenerate -m "$(message)"
 
 Service Management
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 .. code-block:: make
 
@@ -109,7 +113,7 @@ Service Management
         docker exec -it $$img sh -c "alembic upgrade head"
 
 Manual Deployment
----------------
+-----------------
 
 For manual deployment without Docker:
 

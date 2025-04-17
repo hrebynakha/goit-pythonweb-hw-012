@@ -14,8 +14,10 @@ Before starting, ensure you have the following installed:
 * PostgreSQL
 * Redis
 
-Installation
-------------
+Or Docker installed
+
+Installation(without Docker)
+----------------------------
 
 1. Clone the repository::
 
@@ -56,6 +58,25 @@ Running the Application
     $ make run
 
 The API will be available at http://localhost:8000
+
+Installation(with Docker)
+-------------------------
+
+1. Clone the repository::
+
+    $ git clone https://github.com/hrebynakha/goit-pythonweb-hw-012.git
+    $ cd goit-pythonweb-hw-012
+
+2. Create a `.env` file based on `.example.env`::
+
+    $ cp .example.env .env
+
+3. Install the application(it initialize database, redis and run migrations)::
+
+    $ make install
+
+The API will be available at http://localhost:8000
+
 
 API Documentation
 -----------------

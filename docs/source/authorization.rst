@@ -16,10 +16,9 @@ Administrator
 **Role:** ``admin``
 
 Permissions:
-    - Full access to all system features
-    - Manage all users and their contacts
+    - View own contacts
     - View system statistics and metrics
-    - Modify system settings
+    - Modify their avatar and settings
     - Access admin-only endpoints
     - Manage user roles
 
@@ -30,13 +29,13 @@ Regular User
 
 Permissions:
     - Manage own contacts (CRUD operations)
-    - Update own profile information
+    - Update own profile information(except avatar)
     - View own contacts
     - Search and filter own contacts
     - Access birthday notifications
 
 Restrictions:
-    - Cannot access other users' contacts
+    - Cannot update avatar
     - Cannot modify system settings
     - Cannot access admin endpoints
 
@@ -58,38 +57,17 @@ Administrators can modify user avatar and role.
 Permission Checking
 -------------------
 
-The API implements permission checking at multiple levels:
-
-1. Endpoint Level
-~~~~~~~~~~~~~~~~~
-
-Protected by role-specific decorators:
+The API implements permission checking using role-specific decorators:
 
 .. code-block:: python
 
-    @router.get("/admin/users")
-    @require_role("admin")
-    async def list_users():
-        # Only admins can access this endpoint
-        pass
+    @router.get("/protected/admin/route")
+    async def protected_admin_route(
+        user: User = Depends(get_current_admin_user),
+    ):  
+    # Only admins can access this endpoint
+    pass
 
-2. Resource Level
-~~~~~~~~~~~~~~~~~
-
-Contacts are filtered based on user role and ownership:
-
-- Admins can access all contacts
-- Regular users can only access their own contacts
-
-Example:
-
-.. code-block:: python
-
-    if user.role != "admin" and contact.user_id != user.id:
-        raise HTTPException(
-            status_code=403,
-            detail="Not authorized to access this contact"
-        )
 
 Error Responses
 ---------------
