@@ -5,10 +5,6 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.users import User
-
-# from src.models.contacts import Contact
-# from src.repository.contacts import ContactRepository
-# from src.schemas.contacts import ContactModel
 from src.repository.users import UserRepository
 from src.schemas.users import UserCreate
 
