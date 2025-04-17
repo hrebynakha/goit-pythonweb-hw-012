@@ -30,12 +30,11 @@ Example of nginx configuration file:
 
     server {
         listen 80;
-        server_name localhost;
+        server_name your_domain.com;
 
         location / {
-            proxy_pass http://fastapi_app;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
+            include proxy_params;
+            proxy_pass http://localhost:3000;
         }
     }
 
