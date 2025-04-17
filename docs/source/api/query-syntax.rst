@@ -1,12 +1,12 @@
 .. _query_syntax:
 
 Query Syntax
-===========
+============
 
 The UContact API uses `fastapi-sa-orm-filter <https://pypi.org/project/fastapi-sa-orm-filter/>`_ for powerful and flexible filtering capabilities.
 
 Filter Operators
---------------
+----------------
 
 The following operators are available for filtering:
 
@@ -27,7 +27,7 @@ The following operators are available for filtering:
 - ``contains``: Contains pattern
 
 Available Filters
----------------
+-----------------
 
 .. automodule:: src.filters.contacts
    :members:
@@ -37,7 +37,7 @@ Available Filters
 The following fields support filtering:
 
 Text Fields
-~~~~~~~~~~
+~~~~~~~~~~~
 
 - ``first_name``: First name of the contact
     - Supported operators: eq, in_, like, startswith, contains
@@ -49,7 +49,7 @@ Text Fields
     - Supported operators: eq, in_, like, startswith
 
 Date Fields
-~~~~~~~~~~
+~~~~~~~~~~~
 
 - ``birthday``: Contact's birthday
     - Supported operators: eq, gt, lt, between
@@ -59,10 +59,10 @@ Date Fields
     - Supported operators: eq, gt, lt, between
 
 Query Examples
-------------
+--------------
 
 Basic Filtering
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 1. Find contacts with first name "John"::
 
@@ -77,14 +77,14 @@ Basic Filtering
     GET /api/contacts/?query=phone:contains:555
 
 Multiple Conditions
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 You can combine multiple filters using ``,`` as AND operator::
 
     GET /api/contacts/?query=first_name:eq:John,last_name:eq:Doe
 
 Date Range Queries
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 1. Find contacts born after 1990::
 
@@ -99,14 +99,14 @@ Date Range Queries
     GET /api/contacts/?query=birthday:between:1990-01-01,2000-12-31
 
 List Operations
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 1. Find contacts with specific first names::
 
     GET /api/contacts/?query=first_name:in_:["John","Jane","Bob"]
 
 Pattern Matching
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 1. Find contacts whose last name contains "smith" (case-insensitive)::
 
@@ -117,21 +117,21 @@ Pattern Matching
     GET /api/contacts/?query=email:endswith:@example.com
 
 Complex Queries
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 Find contacts named John, created after 2025-01-01, with gmail address::
 
     GET /api/contacts/?query=first_name:eq:John,created_at:gt:2025-01-01,email:endswith:@gmail.com
 
 Response Pagination
-----------------
+-------------------
 
 All filtered queries support pagination using ``skip`` and ``limit`` parameters::
 
     GET /api/contacts/?query=first_name:eq:John&skip=0&limit=10
 
 Error Handling
-------------
+--------------
 
 If an invalid filter is provided, the API will return a 400 Bad Request with an error message::
 
@@ -140,7 +140,7 @@ If an invalid filter is provided, the API will return a 400 Bad Request with an 
     }
 
 Performance Considerations
------------------------
+--------------------------
 
 - Use specific filters when possible (eq instead of like)
 - Combine multiple conditions to reduce the result set

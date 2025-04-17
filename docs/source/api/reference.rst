@@ -1,17 +1,17 @@
 .. _api:
 
 API Reference
-============
+=============
 
 .. contents:: Resource Types
    :local:
    :depth: 2
 
 Common Conventions
-----------------
+------------------
 
 Date and Time Format
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 All ``datetime`` fields (created_at, updated_at) must be in ISO 8601 format in UTC time
 (using time zone designator "Z") and expressed to millisecond precision as
@@ -23,7 +23,7 @@ Date fields (birthday) must be in ISO 8601 date format time Date in UTC	``2025-0
 Also **birthday** field must be in the past.
 
 Authentication
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 All API endpoints except authentication endpoints require JWT authentication.
 Include the JWT token in the Authorization header::
@@ -32,7 +32,7 @@ Include the JWT token in the Authorization header::
 
 
 Rate Limiting
-~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 The API implements rate limiting to prevent abuse:
 
@@ -41,7 +41,7 @@ The API implements rate limiting to prevent abuse:
 - 20 requests per minute for unauthenticated requests for all endpoint
 
 Resource Types
-------------
+--------------
 
 Contact
 ~~~~~~~
@@ -107,7 +107,7 @@ Represents an authenticated user of the API.
     }
 
 Error Responses
--------------
+---------------
 
 The API uses conventional HTTP response codes to indicate the success or failure of requests.
 
@@ -130,7 +130,7 @@ The API uses conventional HTTP response codes to indicate the success or failure
     }
 
 Pagination
----------
+----------
 
 List endpoints support pagination using ``skip`` and ``limit`` parameters:
 
@@ -148,12 +148,12 @@ List endpoints support pagination using ``skip`` and ``limit`` parameters:
 - ``X-Per-Page``: Records per page
 
 Filtering
---------
+---------
 
 The API supports advanced filtering using query parameters. See :ref:`query_syntax` for detailed information about filtering capabilities.
 
 Caching
-------
+-------
 
 The API implements Redis-based caching for improved performance:
 
