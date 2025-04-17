@@ -1,3 +1,16 @@
 readme.md
+test.db
+.coverage
 .gitignore
 venv
+tests
+docs
+compose.yaml
+Dockerfile
+.venv
+htmlcov
+.pytest_cache
+license.md
+.pylintrc
+.example.env
+.redthedocs.yaml
