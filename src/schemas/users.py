@@ -6,6 +6,7 @@ This module defines Pydantic models for user data handling:
 - ORM model integration
 """
 
+import enum
 from pydantic import ConfigDict, BaseModel, EmailStr, Field
 
 
@@ -29,7 +30,6 @@ class User(BaseModel):
     username: str = Field(min_length=3, max_length=40)
     email: EmailStr
     avatar: str
-
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -51,3 +51,10 @@ class UserCreate(BaseModel):
     username: str = Field(min_length=3, max_length=40)
     email: EmailStr
     password: str = Field(min_length=8)
+
+
+class AdvancedUser(User):
+    """User model with additional fields for caching."""
+
+    role: str
+    is_verified: bool

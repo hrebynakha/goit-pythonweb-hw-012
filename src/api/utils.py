@@ -20,7 +20,7 @@ from src.exceptions.utils import (
     DatabaseConnectionError,
     RedisConnectionError,
 )
-from src.redis.client import get_redis, RedisSessionManager
+from src.database.redis.client import get_redis, AsyncRedisSessionManager
 
 router = APIRouter(tags=["utils"])
 
@@ -29,11 +29,15 @@ router = APIRouter(tags=["utils"])
     "/healthchecker",
     response_model=HealthCheckModel,
     responses={
-        500: {"model": HealthCheckErrorModel, "description": "Database or Redis connection error"},
+        500: {
+            "model": HealthCheckErrorModel,
+            "description": "Database or Redis connection error",
+        },
     },
 )
 async def healthchecker(
-    db: AsyncSession = Depends(get_db), redis: RedisSessionManager = Depends(get_redis)
+    db: AsyncSession = Depends(get_db),
+    redis: AsyncRedisSessionManager = Depends(get_redis),
 ):
     """Check health status of critical application services.
 
@@ -68,7 +72,7 @@ async def healthchecker(
         raise DatabaseConnectionError from e
 
     try:
-        redis.ping()
+        await redis.ping()
     except Exception as e:
         raise RedisConnectionError from e
     return {"message": "Welcome to FastAPI!"}

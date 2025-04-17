@@ -73,7 +73,7 @@ class ContactRepository:
         Returns:
             Contact | None: Contact object if found, None otherwise
         """
-        query = select(Contact).filter_by(id=contact_id, user=user)
+        query = select(Contact).filter_by(id=contact_id, user_id=user.id)
         contact = await self.db.execute(query)
         return contact.scalar_one_or_none()
 
@@ -91,7 +91,7 @@ class ContactRepository:
         Returns:
             Contact | None: Contact object if found, None otherwise
         """
-        query = select(Contact).filter_by(email=contact_email, user=user)
+        query = select(Contact).filter_by(email=contact_email, user_id=user.id)
         contact = await self.db.execute(query)
         return contact.scalar_one_or_none()
 
@@ -127,13 +127,12 @@ class ContactRepository:
 
         Args:
             body (ContactModel): Contact data including name, email, etc.
-            user (User): User who will own the contact
+            user_id (int): ID of the user who will own the contact
 
         Returns:
             Contact: Created contact object
         """
-        contact = Contact(**body.model_dump(exclude_unset=True), user=user)
-        print("Creting conatct...", contact)
+        contact = Contact(**body.model_dump(exclude_unset=True), user_id=user.id)
         self.db.add(contact)
         await self.db.commit()
         await self.db.refresh(contact)

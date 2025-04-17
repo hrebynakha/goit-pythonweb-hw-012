@@ -11,7 +11,7 @@ All endpoints require user authentication and support proper error handling.
 
 from typing import List
 
-from fastapi import APIRouter, Depends, status, Query, BackgroundTasks
+from fastapi import APIRouter, Depends, status, Query
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,7 +24,7 @@ from src.schemas.auth import UnauthorizedResponse
 from src.schemas.contacts import ContactNotFoundResponse
 from src.helpers.helpers import filter_normalize
 from src.models.users import User
-from src.redis.client import get_redis, RedisSessionManager
+from src.database.redis.client import get_redis, AsyncRedisSessionManager
 
 router = APIRouter(
     prefix="/contacts",
@@ -37,18 +37,16 @@ router = APIRouter(
 
 @router.get("/", response_model=List[ContactResponse])
 async def read_contacts(
-    background_tasks: BackgroundTasks,
     skip: int = 0,
     limit: int = 100,
     query: str = Query(default=""),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
-    redis: RedisSessionManager = Depends(get_redis),
+    redis: AsyncRedisSessionManager = Depends(get_redis),
 ):
     """Get a paginated and filtered list of user contacts with caching.
 
     Args:
-        background_tasks (BackgroundTasks): FastAPI background tasks for async caching
         skip (int, optional): Number of records to skip. Defaults to 0
         limit (int, optional): Maximum number of records to return. Defaults to 100
         filter (str, optional): Filter query string. Defaults to ""
@@ -63,19 +61,14 @@ async def read_contacts(
         Results are cached in Redis for 10 seconds to improve performance
     """
     key = f"contacts_{str(query)}{skip}{limit}{user.id}"
-    cached_item = redis.get(key)
+    cached_item = await redis.get(key)
     if cached_item:
         return cached_item
     contact_service = ContactService(db)
     contacts = await contact_service.get_contacts(
         filter_normalize(query), skip, limit, user
     )
-    background_tasks.add_task(
-        redis.set,
-        key,
-        jsonable_encoder(contacts),
-        ex=10,
-    )
+    await redis.set(key, jsonable_encoder(contacts), ex=10)
     return contacts
 
 
@@ -84,24 +77,22 @@ async def read_contacts(
     response_model=List[ContactResponse],
 )
 async def get_upcoming_birthday(
-    background_tasks: BackgroundTasks,
     skip: int = 0,
     limit: int = 100,
     time_range: int = 7,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
-    redis: RedisSessionManager = Depends(get_redis),
+    redis: AsyncRedisSessionManager = Depends(get_redis),
 ):
     """Get contacts with upcoming birthdays within specified time range.
 
     Args:
-        background_tasks (BackgroundTasks): FastAPI background tasks for async caching
         skip (int, optional): Number of records to skip. Defaults to 0
         limit (int, optional): Maximum number of records to return. Defaults to 100
         time_range (int, optional): Days to look ahead for birthdays. Defaults to 7
         db (AsyncSession, optional): Database session. Defaults to Depends(get_db)
         user (User, optional): Authenticated user. Defaults to Depends(get_current_user)
-        redis (RedisSessionManager, optional): Redis connection. Defaults to Depends(get_redis)
+        redis (AsyncRedisSessionManager, optional): Redis connection. Defaults to Depends(get_redis)
 
     Returns:
         List[ContactResponse]: List of contacts with upcoming birthdays
@@ -109,7 +100,8 @@ async def get_upcoming_birthday(
     Note:
         Results are cached in Redis for 1 hour to improve performance
     """
-    cached_item = redis.get(f"upcoming_birthday_{user.id}")
+    key = f"upcoming_birthday_{user.id}{skip}{limit}{time_range}"
+    cached_item = await redis.get(key)
     if cached_item:
         return cached_item
     contact_service = ContactService(db)
@@ -117,10 +109,7 @@ async def get_upcoming_birthday(
     contacts = await contact_service.get_upcoming_birthday_contacts(
         skip, limit, time_range, user
     )
-
-    background_tasks.add_task(
-        redis.set, f"upcoming_birthday_{user.id}", jsonable_encoder(contacts), ex=3600
-    )
+    await redis.set(key, jsonable_encoder(contacts), ex=3600)
     return contacts
 
 
@@ -133,18 +122,16 @@ async def get_upcoming_birthday(
 )
 async def read_contact(
     contact_id: int,
-    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
-    redis: RedisSessionManager = Depends(get_redis),
+    redis: AsyncRedisSessionManager = Depends(get_redis),
     user: User = Depends(get_current_user),
 ):
     """Get a specific contact by ID with caching.
 
     Args:
         contact_id (int): ID of the contact to retrieve
-        background_tasks (BackgroundTasks): FastAPI background tasks for async caching
         db (AsyncSession, optional): Database session. Defaults to Depends(get_db)
-        redis (RedisSessionManager, optional): Redis connection. Defaults to Depends(get_redis)
+        redis (AsyncRedisSessionManager, optional): Redis connection. Defaults to Depends(get_redis)
         user (User, optional): Authenticated user. Defaults to Depends(get_current_user)
 
     Returns:
@@ -156,16 +143,15 @@ async def read_contact(
     Note:
         Results are cached in Redis for 10 seconds to improve performance
     """
-    cached_item = redis.get(f"contact_{contact_id}")
+    cached_item = await redis.get(f"contact_{contact_id}")
     if cached_item:
         return cached_item
     contact_service = ContactService(db)
     contact = await contact_service.get_contact(contact_id, user)
     if contact is None:
         raise ContactNotFound
-    background_tasks.add_task(
-        redis.set, f"contact_{contact_id}", jsonable_encoder(contact), ex=10
-    )
+
+    redis.set(f"contact_{contact_id}", jsonable_encoder(contact), ex=10)
     return contact
 
 
@@ -192,7 +178,6 @@ async def create_contact(
     Note:
         The contact will be associated with the authenticated user
     """
-    print("Create ne conatct", body, "fro user", user)
     contact_service = ContactService(db)
     return await contact_service.create_contact(body, user)
 
