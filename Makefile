@@ -1,5 +1,12 @@
 include .env
 
+install:
+	@echo "Installing dependencies..."
+	docker-compose up -d
+	@echo "Installing database..."
+	- docker-compose exec db sh -c "psql -U postgres -c 'create database contacts_app'"
+	@echo "Running migrations..."
+	docker-compose exec app sh -c "alembic upgrade head"
 updb:
 	docker run --name hw012 -p 5432:5432 -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -d postgres
 newdb:
