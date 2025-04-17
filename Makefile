@@ -4,7 +4,8 @@ install:
 	@echo "Installing dependencies..."
 	docker compose up -d
 	@echo "Installing database..."
-	- docker compose exec db sh -c "psql -U postgres -c 'create database contacts_app'"
+	- docker compose exec db psql -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'contacts_app'" | grep -q 1 || \
+		docker compose exec db psql -U postgres -c "CREATE DATABASE contacts_app;"
 	@echo "Running migrations..."
 	docker compose exec app sh -c "alembic upgrade head"
 updb:
