@@ -1,7 +1,7 @@
 .. _about:
 
 About UContacts
-=============
+===============
 
 Overview
 --------
@@ -14,7 +14,7 @@ History
 The project was initiated in 2025 by Hrebynakha Anatolii as part of the GoIT Python Web Development course. It has evolved from a simple contact management system into a full-featured API service with advanced capabilities like contact filtering, birthday notifications, and role-based access control.
 
 Key Features
-----------
+------------
 
 - **Modern Architecture**: Built with FastAPI for high performance and async support
 - **Secure Authentication**: JWT-based authentication with email verification
@@ -26,36 +26,36 @@ Key Features
 - **Comprehensive Documentation**: Detailed API documentation with Swagger/ReDoc UI
 
 Technology Stack
--------------
+----------------
 
 Backend Framework
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 - FastAPI (Python 3.10+)
 - Uvicorn ASGI server
 - SQLAlchemy ORM
 - Alembic migrations
 
 Database & Caching
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 - PostgreSQL for persistent storage
 - Redis for caching and session management
 
 Security
-~~~~~~~
+~~~~~~~~
 - JWT authentication
 - Password hashing with bcrypt
 - Email verification
 - CORS support
 
 DevOps & Deployment
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 - Docker containerization
 - Docker Compose orchestration
 - Nginx reverse proxy
 - GitHub Actions CI/CD
 
 Contributing
------------
+------------
 
 UContacts is an open-source project, and contributions are welcome! Here's how you can contribute:
 
@@ -72,7 +72,7 @@ We appreciate:
 - Code contributions
 
 Future Plans
-----------
+------------
 
 We're continuously working to improve UContacts. Upcoming features include:
 

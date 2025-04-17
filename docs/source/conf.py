@@ -23,6 +23,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
 ]
+autodoc_mock_imports = ["fastapi", "sqlalchemy", "pydantic", "pydantic_settings", "fastapi_sa_orm_filter"]
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
