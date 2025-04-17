@@ -23,3 +23,5 @@ upredis:
 	docker run --name redis-hw012 -p 6379:6379 -d redis:8.0-rc1
 docrq:
 	poetry export --without-hashes -f requirements.txt --output docs/requirements.txt --only "docs"
+tst:
+	pytest -v tests

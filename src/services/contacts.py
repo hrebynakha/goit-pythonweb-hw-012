@@ -103,6 +103,9 @@ class ContactService:
         Raises:
             EmailValueError: If the new email conflicts with another contact
         """
+        existing_contact = await self.repository.get_contact_by_id(contact_id, user)
+        if existing_contact is None:
+            return None
         existing_contact = await self.repository.get_contact_by_email_and_contact_id(
             body.email, contact_id, user
         )

@@ -59,7 +59,7 @@ async def register_user(
     user_service = UserService(db)
 
     if await user_service.get_user_by_email(user_data.email):
-        raise RegistrationError(detail="User with this email alredy exist")
+        raise RegistrationError(detail="User with this email already exist")
 
     if await user_service.get_user_by_username(user_data.username):
         raise RegistrationError
@@ -88,8 +88,12 @@ async def login_user(
     """
     user_service = UserService(db)
     user = await user_service.get_user_by_username(form_data.username)
-    if not user or not Hash().verify_password(form_data.password, user.hashed_password):
+    if not user:
         raise AuthError(detail="User or password is incorrect")
+    if not Hash().verify_password(form_data.password, user.hashed_password):
+        raise AuthError(detail="User or password is incorrect")
+    if user.is_verified is False:
+        raise AuthError(detail="User is not verified")
 
     return await AuthService(db).generate_jwt(user.username)
 
@@ -189,7 +193,7 @@ async def set_password(
 
     email = await TokenService().get_email_from_token(token)
     if not email:
-        raise InvalidVerificationTokenError
+        raise InvalidVerificationTokenError(detail="Invalid reset password token")
 
     user_service = UserService(db)
     user = await user_service.get_user_by_email(email)

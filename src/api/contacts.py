@@ -151,7 +151,7 @@ async def read_contact(
     if contact is None:
         raise ContactNotFound
 
-    redis.set(f"contact_{contact_id}", jsonable_encoder(contact), ex=10)
+    await redis.set(f"contact_{contact_id}", jsonable_encoder(contact), ex=10)
     return contact
 
 
