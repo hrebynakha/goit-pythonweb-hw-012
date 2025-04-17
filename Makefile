@@ -3,6 +3,8 @@ include .env
 install:
 	@echo "Installing dependencies..."
 	docker compose up -d
+	@echo "Waiting for services to start..."	
+	sleep 5
 	@echo "Installing database..."
 	- docker compose exec db psql -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'contacts_app'" | grep -q 1 || \
 		docker compose exec db psql -U postgres -c "CREATE DATABASE contacts_app;"
