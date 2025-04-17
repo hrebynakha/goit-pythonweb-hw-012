@@ -47,31 +47,12 @@ cd goit-pythonweb-hw-012
 
 Create your `.env` file (see `docs/source/configuration.rst` for details):
 ```ini
-POSTGRES_DB=contacts_app
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=password1
-POSTGRES_PORT=5432
-POSTGRES_HOST=localhost
-DB_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-SECRET_KEY=your_secret_key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=15
-REFRESH_TOKEN_EXPIRE_MINUTES=10080
+cp .env.example .env
 ```
 
 Run the app and database with Docker Compose:
 ```bash
-make up
-```
-
-Initialize the database and run migrations:
-```bash
-make migrate
-```
-
-Start the API server:
-```bash
-make run
+make install
 ```
 
 The API will be available at [http://localhost:8000](http://localhost:8000)
