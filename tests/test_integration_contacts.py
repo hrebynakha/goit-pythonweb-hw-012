@@ -1,3 +1,5 @@
+# test_integration_contacts.py - Integration tests for contacts API endpoints
+
 contact_data = {
     "first_name": "test_first_name",
     "last_name": "test_last_name",

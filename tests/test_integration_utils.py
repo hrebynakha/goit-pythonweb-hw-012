@@ -1,3 +1,5 @@
+# test_integration_utils.py - Integration tests for utility functions and error handling
+
 # pylint: disable=redefined-outer-name, unused-argument
 
 import pytest

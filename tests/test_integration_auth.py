@@ -1,3 +1,4 @@
+# test_integration_auth.py - Integration tests for authentication features
 from unittest.mock import AsyncMock
 import pytest
 from sqlalchemy import select

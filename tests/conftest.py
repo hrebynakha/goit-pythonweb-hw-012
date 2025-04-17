@@ -1,3 +1,5 @@
+# conftest.py - Fixtures and configuration for test suite
+
 import asyncio
 
 import pytest

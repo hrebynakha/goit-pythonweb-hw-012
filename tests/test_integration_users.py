@@ -1,3 +1,4 @@
+# test_integration_users.py - Integration tests for users API endpoints
 from unittest.mock import patch
 
 from tests.conftest import test_user, test_admin_user
