@@ -1,1 +1,1 @@
-web: gunicorn --bind :8000 --workers 3 --threads 2 src.app:app
+web: gunicorn -w 4 -k uvicorn.workers.UvicornWorker src.app:app

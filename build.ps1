@@ -7,15 +7,14 @@ Copy-Item -Path "src" -Destination "build/src" -Exclude "*__pycache__*", "*.pyc"
 Copy-Item -Path "migrations" -Destination "build/migrations" -Exclude "*__pycache__*", "*.pyc" -Recurse
 Copy-Item -Path "main.py" -Destination "build/main.py"
 Copy-Item -Path "Procfile" -Destination "build/Procfile"
+Copy-Item "requirements.txt" "build/requirements.txt"
 
-./venv/Scripts/poetry.exe export --without-hashes -f requirements.txt --output "build/requirements.txt"
+$dist = Get-Item ".\dist" | Select-Object -ExpandProperty FullName
 
-$dist = Get-Item ".\dist" | Select -ExpandProperty FullName
-
-$zipName = Join-path   $dist "$(date -f "yyyy-MM-dd_HH-mm-ss")_build.zip"
+$zipName = Join-path   $dist "$(Get-Date -Format "yyyy-MM-dd_HH-mm-ss")_build.zip"
 
 Write-host "Output to $zipName"
-cd "build"
+Set-Location "build"
 & "C:\Program Files\7-Zip\7z.exe" a $zipName "*" -tzip
-cd ..
+Set-Location ..
 

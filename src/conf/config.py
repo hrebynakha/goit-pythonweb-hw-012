@@ -67,7 +67,7 @@ class Settings(BaseSettings):
 
     # Core Settings
     DEBUG: bool = False
-    DB_URL: str = "postgresql://postgres:postgres@localhost:5432/contacts_app"
+    DB_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/contacts_app"
     ALLOWED_CORS: list[str] = ["*"]
 
     # Redis Configuration
