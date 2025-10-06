@@ -66,9 +66,9 @@ class Settings(BaseSettings):
     """
 
     # Core Settings
-    DEBUG: bool
-    DB_URL: str
-    ALLOWED_CORS: list[str]
+    DEBUG: bool = False
+    DB_URL: str = "postgresql://postgres:postgres@localhost:5432/contacts_app"
+    ALLOWED_CORS: list[str] = ["*"]
 
     # Redis Configuration
     REDIS_HOST: str = "localhost"
@@ -88,12 +88,12 @@ class Settings(BaseSettings):
     VALIDATE_CERTS: bool = True
 
     # Cloudinary Configuration
-    CLOUDINARY_NAME: str
+    CLOUDINARY_NAME: str = "cloudinary"
     CLOUDINARY_API_KEY: int = 123456789
     CLOUDINARY_API_SECRET: str = "secret"
 
     # JWT Configuration
-    JWT_SECRET: str
+    JWT_SECRET: str = "secret"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_JWT_EXPIRATION_SECONDS: int = 900  # 15 min
     REFRESH_JWT_EXPIRATION_SECONDS: int = 604800  # 7 days

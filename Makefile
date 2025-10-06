@@ -28,6 +28,9 @@ f:
 	black . --exclude=venv
 run:
 	python main.py
+
+rq:
+	poetry export --without-hashes -f requirements.txt --output requirements.txt
 up:
 	poetry export --without-hashes -f requirements.txt --output requirements.txt
 	docker compose up -d
@@ -42,3 +45,5 @@ tst:
 	pytest -v tests
 reptest:
 	pytest --cov=src tests/ --cov-report=html 
+b:
+	powershell -ExecutionPolicy Bypass -Command "& .\build.ps1"
