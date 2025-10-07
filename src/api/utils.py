@@ -13,6 +13,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 
+
 from src.database.db import get_db
 from src.schemas.utils import HealthCheckModel, HealthCheckErrorModel
 from src.exceptions.utils import (
@@ -37,7 +38,7 @@ router = APIRouter(tags=["utils"])
 )
 async def healthchecker(
     db: AsyncSession = Depends(get_db),
-    redis: AsyncRedisSessionManager = Depends(get_redis),
+    redis: AsyncRedisSessionManager | None = Depends(get_redis),
 ):
     """Check health status of critical application services.
 
@@ -67,12 +68,17 @@ async def healthchecker(
         result = result.scalar_one_or_none()
 
         if result is None:
+            print("DB has not result!")
             raise DatabaseConfigError
     except Exception as e:
+        print("Database connection error", e)
         raise DatabaseConnectionError from e
-
-    try:
-        await redis.ping()
-    except Exception as e:
-        raise RedisConnectionError from e
+    if not redis is None:
+        try:
+            await redis.ping()
+        except Exception as e:
+            print("Redis connection error", e)
+            raise RedisConnectionError from e
+    else:
+        print("Redis not created or off by config")
     return {"message": "Welcome to FastAPI!"}

@@ -1,6 +1,7 @@
 """Env migartions file"""
 
 import importlib
+import ssl
 import pkgutil
 import asyncio
 from logging.config import fileConfig
@@ -25,9 +26,21 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 
-target_metadata = Base.metadata
-config.set_main_option("sqlalchemy.url", conf.DB_URL)
+if conf.DB_SSL_MODE == "require":
+    ssl_context = ssl.create_default_context(cafile="rds-ca-bundle.pem")
+else:
+    ssl_context = None
 
+
+
+target_metadata = Base.metadata
+x_args = context.get_x_argument(as_dictionary=True)
+database_url = x_args.get("database_url")
+
+if database_url:
+    config.set_main_option("sqlalchemy.url", database_url)
+else:
+    config.set_main_option("sqlalchemy.url", conf.DB_URL)
 
 def run_migrations(connection: Connection):
     """Run migration function"""
@@ -44,6 +57,7 @@ async def run_async_migrations():
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args={"ssl": ssl_context},
     )
 
     async with connectable.connect() as connection:

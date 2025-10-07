@@ -42,7 +42,7 @@ async def read_contacts(
     query: str = Query(default=""),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
-    redis: AsyncRedisSessionManager = Depends(get_redis),
+    redis: AsyncRedisSessionManager | None = Depends(get_redis),
 ):
     """Get a paginated and filtered list of user contacts with caching.
 
@@ -61,14 +61,15 @@ async def read_contacts(
         Results are cached in Redis for 10 seconds to improve performance
     """
     key = f"contacts_{str(query)}{skip}{limit}{user.id}"
-    cached_item = await redis.get(key)
+    cached_item = await redis.get(key) if redis else None
     if cached_item:
         return cached_item
     contact_service = ContactService(db)
     contacts = await contact_service.get_contacts(
         filter_normalize(query), skip, limit, user
     )
-    await redis.set(key, jsonable_encoder(contacts), ex=10)
+    if not redis is None:
+        await redis.set(key, jsonable_encoder(contacts), ex=10)
     return contacts
 
 
@@ -82,7 +83,7 @@ async def get_upcoming_birthday(
     time_range: int = 7,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
-    redis: AsyncRedisSessionManager = Depends(get_redis),
+    redis: AsyncRedisSessionManager | None = Depends(get_redis),
 ):
     """Get contacts with upcoming birthdays within specified time range.
 
@@ -101,7 +102,7 @@ async def get_upcoming_birthday(
         Results are cached in Redis for 1 hour to improve performance
     """
     key = f"upcoming_birthday_{user.id}{skip}{limit}{time_range}"
-    cached_item = await redis.get(key)
+    cached_item = await redis.get(key) if redis else None
     if cached_item:
         return cached_item
     contact_service = ContactService(db)
@@ -109,7 +110,8 @@ async def get_upcoming_birthday(
     contacts = await contact_service.get_upcoming_birthday_contacts(
         skip, limit, time_range, user
     )
-    await redis.set(key, jsonable_encoder(contacts), ex=3600)
+    if not redis is None:
+        await redis.set(key, jsonable_encoder(contacts), ex=3600)
     return contacts
 
 
@@ -123,7 +125,7 @@ async def get_upcoming_birthday(
 async def read_contact(
     contact_id: int,
     db: AsyncSession = Depends(get_db),
-    redis: AsyncRedisSessionManager = Depends(get_redis),
+    redis: AsyncRedisSessionManager | None = Depends(get_redis),
     user: User = Depends(get_current_user),
 ):
     """Get a specific contact by ID with caching.
@@ -143,7 +145,8 @@ async def read_contact(
     Note:
         Results are cached in Redis for 10 seconds to improve performance
     """
-    cached_item = await redis.get(f"contact_{contact_id}")
+
+    cached_item = await redis.get(f"contact_{contact_id}") if redis else None
     if cached_item:
         return cached_item
     contact_service = ContactService(db)
@@ -151,7 +154,8 @@ async def read_contact(
     if contact is None:
         raise ContactNotFound
 
-    await redis.set(f"contact_{contact_id}", jsonable_encoder(contact), ex=10)
+    if not redis is None:
+        await redis.set(f"contact_{contact_id}", jsonable_encoder(contact), ex=10)
     return contact
 
 

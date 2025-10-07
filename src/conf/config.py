@@ -11,10 +11,11 @@ Configuration is loaded from environment variables and .env files, with
 validation performed at startup to ensure all required values are present.
 """
 
+import json
 from pydantic_settings import BaseSettings
 from pydantic import ConfigDict, EmailStr
 from pydantic import computed_field
-
+from pydantic import field_validator
 
 class Settings(BaseSettings):
     """Application configuration settings.
@@ -68,15 +69,18 @@ class Settings(BaseSettings):
 
     # Core Settings
     DEBUG: bool = False
-    POSTGRES_DB: str = "contacts_app"
+    DB_SECRET_JSON: str | None = None  # prod: JSON string from Secrets Manager
+    DB_SSL_MODE: str = "require"
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "password"
+    POSTGRES_DB: str = "contacts_app"
     POSTGRES_PORT: int = 5432
     POSTGRES_HOST: str = "localhost"
 
     ALLOWED_CORS: list[str] = ["*"]
 
     # Redis Configuration
+    USE_REDIS: bool = False
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     REDIS_PASSWORD: str | None = None
@@ -127,15 +131,32 @@ class Settings(BaseSettings):
         extra="ignore", env_file=".env", env_file_encoding="utf-8", case_sensitive=True
     )
 
-    @computed_field  # (Pydantic v2+)
+    @field_validator("POSTGRES_USER")
+    @classmethod
+    def _postgres_user(cls, v: str, info) -> str:
+        if info.data.get("DB_SECRET_JSON") is None:
+            return v
+        return json.loads(info.data.get("DB_SECRET_JSON"))["username"]
+
+    @field_validator("POSTGRES_PASSWORD")
+    @classmethod
+    def _postgres_password(cls, v: str, info) -> str:
+        if info.data.get("DB_SECRET_JSON") is None:
+            return v
+        return json.loads(info.data.get("DB_SECRET_JSON"))["password"]
+
+    @computed_field
     @property
     def DB_URL(self) -> str: # pylint: disable=invalid-name
         """Computed field"""
-        return (
+
+        url =  (
             f"postgresql+asyncpg://"
             f"{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
             f"{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
+        print("Database connection url:", url)
+        return url
 
 
 settings = Settings()

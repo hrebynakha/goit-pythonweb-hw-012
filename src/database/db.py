@@ -9,6 +9,7 @@ It implements an async session manager using SQLAlchemy's async features, provid
 """
 
 import contextlib
+import ssl
 
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
@@ -37,7 +38,16 @@ class DatabaseSessionManager:
         Args:
             url (str): Database connection URL
         """
-        self._engine: AsyncEngine | None = create_async_engine(url)
+        if config.DB_SSL_MODE == "require":
+            ssl_context = ssl.create_default_context(cafile="rds-ca-bundle.pem")
+        else:
+            ssl_context = None
+
+        print("Created Database ssl context", ssl_context)
+
+        self._engine: AsyncEngine | None = create_async_engine(
+            url, connect_args={"ssl": ssl_context}
+        )
         self._session_maker: async_sessionmaker = async_sessionmaker(
             autoflush=False, autocommit=False, bind=self._engine
         )

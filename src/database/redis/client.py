@@ -44,4 +44,6 @@ client = AsyncRedisSessionManager()
 
 async def get_redis():
     """Get the global Redis session manager instance (for FastAPI Depends)."""
+    if settings.USE_REDIS is False:
+        return None
     return client
