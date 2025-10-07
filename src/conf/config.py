@@ -13,6 +13,7 @@ validation performed at startup to ensure all required values are present.
 
 from pydantic_settings import BaseSettings
 from pydantic import ConfigDict, EmailStr
+from pydantic import computed_field
 
 
 class Settings(BaseSettings):
@@ -67,7 +68,12 @@ class Settings(BaseSettings):
 
     # Core Settings
     DEBUG: bool = False
-    DB_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/contacts_app"
+    POSTGRES_DB: str = "contacts_app"
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str = "password"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_HOST: str = "localhost"
+
     ALLOWED_CORS: list[str] = ["*"]
 
     # Redis Configuration
@@ -120,6 +126,16 @@ class Settings(BaseSettings):
     model_config = ConfigDict(
         extra="ignore", env_file=".env", env_file_encoding="utf-8", case_sensitive=True
     )
+
+    @computed_field  # (Pydantic v2+)
+    @property
+    def DB_URL(self) -> str: # pylint: disable=invalid-name
+        """Computed field"""
+        return (
+            f"postgresql+asyncpg://"
+            f"{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
+            f"{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        )
 
 
 settings = Settings()
