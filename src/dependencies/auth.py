@@ -17,7 +17,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 async def get_auth_user(
     db: AsyncSession = Depends(get_db),
-    redis: AsyncRedisSessionManager = Depends(get_redis),
+    redis: AsyncRedisSessionManager | None = Depends(get_redis),
     token: str = Depends(oauth2_scheme),
 ) -> AdvancedUser:
     """Authenticate and retrieve the current user from JWT token with Redis caching.
@@ -55,7 +55,7 @@ async def get_auth_user(
     except JWTError as e:
         raise AuthError(detail=str(e)) from e
 
-    cache_item = await redis.get(token)
+    cache_item = await redis.get(token) if redis else None
     if cache_item:
         return AdvancedUser.model_validate(cache_item)
     user_repository = UserRepository(db)
@@ -68,5 +68,6 @@ async def get_auth_user(
         raise AuthError(detail="User not verified.")
 
     user_schema = AdvancedUser.model_validate(user)
-    await redis.set(token, user_schema.model_dump())
+    if not redis is None:
+        await redis.set(token, user_schema.model_dump())
     return user_schema
